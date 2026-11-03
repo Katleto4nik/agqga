@@ -1,3 +1,4 @@
+
 package com.violethitboxes;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -33,33 +34,45 @@ public final class VioletHitboxesClient implements ClientModInitializer {
             cachedCobwebs = List.of();
             return;
         }
+
         if (++cacheTicks < 10) return;
         cacheTicks = 0;
+
         BlockPos center = client.player.getBlockPos();
         List<BlockPos> found = new ArrayList<>();
         int radius = VioletHitboxesRenderer.WEB_SCAN_RADIUS;
         BlockPos.Mutable pos = new BlockPos.Mutable();
+
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
                     pos.set(center.getX() + x, center.getY() + y, center.getZ() + z);
-                    if (client.world.getBlockState(pos).isOf(Blocks.COBWEB)) found.add(pos.toImmutable());
+
+                    if (client.world.getBlockState(pos).isOf(Blocks.COBWEB)) {
+                        found.add(pos.toImmutable());
+                    }
                 }
             }
         }
+
         cachedCobwebs = List.copyOf(found);
     }
 
     private static void handleF3B(MinecraftClient client) {
-        if (client.getWindow() == null || client.currentScreen != null) return;
+        if (client.currentScreen != null) return;
 
-        long window = client.getWindow().getHandle();
-        boolean f3Down = InputUtil.isKeyPressed(window, GLFW.GLFW_KEY_F3);
-        boolean bDown = InputUtil.isKeyPressed(window, GLFW.GLFW_KEY_B);
+        boolean f3Down = InputUtil.isKeyPressed(
+                client.getWindow(), GLFW.GLFW_KEY_F3
+        );
+
+        boolean bDown = InputUtil.isKeyPressed(
+                client.getWindow(), GLFW.GLFW_KEY_B
+        );
 
         if (f3Down && bDown && !previousB) {
             enabled = !enabled;
         }
+
         previousB = bDown;
     }
 }
